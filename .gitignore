@@ -1,1 +1,13 @@
 **/.DS_Store
+__pycache__/
+*.py[cod]
+.idea/
+*.egg*
+/data/
+/models/
+/data
+/models
+data/scienceqa/**
+*.pth
+*.npy
+.env

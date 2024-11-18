@@ -1,3 +1,16 @@
+# MM-CoT Ablation Study
+
+This repository is forked from [mm-cot](https://github.com/amazon-science/mm-cot) to study rationale masking effects.
+
+## Modifications
+- Added rationale masking experiments
+- Modified model architecture for ablation studies
+- [other changes]
+
+## Original License
+This project is based on Apache 2.0 licensed code. See LICENSE file.
+
+
 # Multimodal Chain-of-Thought Reasoning in Language Models
 
 <h5 align="center"><i>"Imagine learning a textbook without figures or tables."</i></h5>
