@@ -4,9 +4,10 @@ __pycache__/
 .idea/
 *.egg*
 /data/
-/models/
+/!obsolete/
+/models/mm-cot-large-answer
+/models/mm-cot-large-rationale
 /data
-/models
 data/scienceqa/**
 *.pth
 *.npy

@@ -1,14 +1,18 @@
-# MM-CoT Ablation Study
+# MM-CoT Rationale Masking Study
 
-This repository is forked from [mm-cot](https://github.com/amazon-science/mm-cot) to study rationale masking effects.
+This repository is forked from [mm-cot](https://github.com/amazon-science/mm-cot) to study the rationale masking effects on answer inference of the multimodal CoT model presented in [Multimodal Chain-of-Thought Reasoning in Language Models](https://arxiv.org/abs/2302.00923).
+
+The project group consists of  code is submitted as part of the Advanced Natural Language Processing course at the IT University of Copenhagen in Autumn 2024.
+
+Reading the paper, the project group noticed that the generated rationale contains the answer word-for-word used for answer inference. Therefore, the aim of this repo and our project is to observe what effects masking the last line of the generated rationale, or masking 50% of the rationale, has on the answer.  
 
 ## Modifications
 - Added rationale masking experiments
 - Modified model architecture for ablation studies
-- [other changes]
+- 
 
 ## Original License
-This project is based on Apache 2.0 licensed code. See LICENSE file.
+This project is based on Apache 2.0 licensed code. 
 
 
 # Multimodal Chain-of-Thought Reasoning in Language Models
