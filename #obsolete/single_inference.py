@@ -1,6 +1,6 @@
 import json
 import torch
-from model import T5ForMultimodalGeneration
+from original.model import T5ForMultimodalGeneration
 from transformers import AutoTokenizer
 import os
 
