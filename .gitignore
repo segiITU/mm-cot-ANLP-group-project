@@ -4,7 +4,7 @@ __pycache__/
 .idea/
 *.egg*
 /data/
-/#obsolete/
+/x-obsolete/
 /models/mm-cot-large-answer
 /models/mm-cot-large-rationale
 /models/mm-cot-base-rationale
