@@ -30,7 +30,7 @@ def extract_image_features(image_path, vit_features_path="vision_features/vit.pt
        print(f"\nError loading features: {str(e)}")
        return None
 
-def run_mm_cot(image_path, question, context, options):
+def run_mm_cot(image_path, question, context, options, caption=None):
    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
    print("Loading tokenizer...")
    tokenizer = AutoTokenizer.from_pretrained("declare-lab/flan-alpaca-large")
@@ -40,27 +40,24 @@ def run_mm_cot(image_path, question, context, options):
        "models/mm-cot-base-rationale",
        patch_size=(145, 1024),
        local_files_only=True
-   ).to(device)
+   ).eval().to(device)
    
    answer_model = T5ForMultimodalGeneration.from_pretrained(
-       "models/mm-cot-base-ans",
+       "models/mm-cot-base-ans", 
        patch_size=(145, 1024),
        local_files_only=True
-   ).to(device)
+   ).eval().to(device)
 
-   input_text = (
-       f"Question: {question}\n"
-       f"Context: {context}\n"
-       f"Options: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\n"
-       f"Let's analyze this step by step:"
-   )
+   # Load vision features
+   vision_features = extract_image_features(image_path).to(device)
    
-   vision_features = extract_image_features(image_path)
-   if vision_features is not None:
-       vision_features = vision_features.to(device)
-   else:
-       vision_features = torch.zeros((1, 145, 1024)).to(device)
-       
+   # Append caption to context if provided
+   context_with_caption = context
+   if caption:
+       context_with_caption = f"{context}\nImage description: {caption}"
+   
+   # Prepare rationale generation with caption-enhanced context
+   input_text = f"Question: {question}\nContext: {context_with_caption}\nOptions: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\nLet's analyze this step by step:"
    inputs = tokenizer(input_text, return_tensors="pt", max_length=512, truncation=True)
    inputs = {k: v.to(device) for k, v in inputs.items()}
    
@@ -70,37 +67,37 @@ def run_mm_cot(image_path, question, context, options):
            attention_mask=inputs["attention_mask"],
            image_ids=vision_features,
            max_length=128,
-           do_sample=False
+           num_return_sequences=1,
+           use_cache=True
        )
    
    rationale = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-   input_text_with_rationale = (
-       f"Question: {question}\n"
-       f"Context: {context}\n"
-       f"Rationale: {rationale}\n"
-       f"Options: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\n"
-       f"Based on this analysis, the answer is:"
-   )
-
+   
+   # Prepare answer generation with caption-enhanced context
+   input_text_with_rationale = f"Question: {question}\nContext: {context_with_caption}\nRationale: {rationale}\nOptions: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\nBased on this analysis, the answer is:"
    inputs = tokenizer(input_text_with_rationale, return_tensors="pt", max_length=512, truncation=True)
    inputs = {k: v.to(device) for k, v in inputs.items()}
-
+   
    with torch.no_grad():
        outputs = answer_model.generate(
            input_ids=inputs["input_ids"],
            attention_mask=inputs["attention_mask"],
            image_ids=vision_features,
            max_length=32,
-           do_sample=False
+           num_return_sequences=1,
+           use_cache=True
        )
-
-   answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
    
-   return {'rationale': rationale, 'answer': answer}
+   answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
+   return {
+       'caption': caption,
+       'context_with_caption': context_with_caption,
+       'rationale': rationale, 
+       'answer': answer
+   }
 
 if __name__ == "__main__":
-   image_path = "data/scienceqa/data/images/208/image.png"
+   image_path = "data/scienceqa/data/images/86/image.png"
    question = "Will these magnets attract or repel each other?"
    context = "Two magnets are placed as shown."
    options = ["attract", "repel"]
@@ -108,10 +105,19 @@ if __name__ == "__main__":
    # Display image first
    display_image(image_path)
    
+   print("\nEnter image caption (press Enter for no caption):")
+   caption = input().strip()
+   
    print("\nQuestion:", question)
    print("Context:", context) 
    print("Options:", ', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options)))
    
-   result = run_mm_cot(image_path, question, context, options)
-   print(f"\nRationale: {result['rationale']}")
-   print(f"\nAnswer: {result['answer']}")
+   result = run_mm_cot(image_path, question, context, options, caption=caption)
+   
+   print("\nResults:")
+   print("-" * 50)
+   if caption:
+       print(f"Caption used: {result['caption']}")
+       print(f"Context with caption: {result['context_with_caption']}")
+   print(f"Rationale: {result['rationale']}")
+   print(f"Answer: {result['answer']}")

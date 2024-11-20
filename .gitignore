@@ -5,12 +5,11 @@ __pycache__/
 *.egg*
 /data/
 /x-obsolete/
-/models/mm-cot-large-answer
-/models/mm-cot-large-rationale
-/models/mm-cot-base-rationale
-/models/mm-cot-base-ans
 /data
 data/scienceqa/images/
 *.pth
 *.npy
 .env
+
+/models/*
+!/models/README.md

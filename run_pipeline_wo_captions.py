@@ -40,27 +40,19 @@ def run_mm_cot(image_path, question, context, options):
        "models/mm-cot-base-rationale",
        patch_size=(145, 1024),
        local_files_only=True
-   ).to(device)
+   ).eval().to(device)
    
    answer_model = T5ForMultimodalGeneration.from_pretrained(
-       "models/mm-cot-base-ans",
+       "models/mm-cot-base-ans", 
        patch_size=(145, 1024),
        local_files_only=True
-   ).to(device)
+   ).eval().to(device)
 
-   input_text = (
-       f"Question: {question}\n"
-       f"Context: {context}\n"
-       f"Options: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\n"
-       f"Let's analyze this step by step:"
-   )
+   # Load vision features
+   vision_features = extract_image_features(image_path).to(device)
    
-   vision_features = extract_image_features(image_path)
-   if vision_features is not None:
-       vision_features = vision_features.to(device)
-   else:
-       vision_features = torch.zeros((1, 145, 1024)).to(device)
-       
+   # Prepare rationale generation
+   input_text = f"Question: {question}\nContext: {context}\nOptions: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\nLet's analyze this step by step:"
    inputs = tokenizer(input_text, return_tensors="pt", max_length=512, truncation=True)
    inputs = {k: v.to(device) for k, v in inputs.items()}
    
@@ -70,37 +62,32 @@ def run_mm_cot(image_path, question, context, options):
            attention_mask=inputs["attention_mask"],
            image_ids=vision_features,
            max_length=128,
-           do_sample=False
+           num_return_sequences=1,
+           use_cache=True
        )
    
    rationale = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-   input_text_with_rationale = (
-       f"Question: {question}\n"
-       f"Context: {context}\n"
-       f"Rationale: {rationale}\n"
-       f"Options: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\n"
-       f"Based on this analysis, the answer is:"
-   )
-
+   
+   # Prepare answer generation
+   input_text_with_rationale = f"Question: {question}\nContext: {context}\nRationale: {rationale}\nOptions: {', '.join(f'({chr(65+i)}) {opt}' for i, opt in enumerate(options))}\nBased on this analysis, the answer is:"
    inputs = tokenizer(input_text_with_rationale, return_tensors="pt", max_length=512, truncation=True)
    inputs = {k: v.to(device) for k, v in inputs.items()}
-
+   
    with torch.no_grad():
        outputs = answer_model.generate(
            input_ids=inputs["input_ids"],
            attention_mask=inputs["attention_mask"],
            image_ids=vision_features,
            max_length=32,
-           do_sample=False
+           num_return_sequences=1,
+           use_cache=True
        )
-
-   answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
    
+   answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
    return {'rationale': rationale, 'answer': answer}
 
 if __name__ == "__main__":
-   image_path = "data/scienceqa/data/images/208/image.png"
+   image_path = "data/scienceqa/data/images/86/image.png"
    question = "Will these magnets attract or repel each other?"
    context = "Two magnets are placed as shown."
    options = ["attract", "repel"]
