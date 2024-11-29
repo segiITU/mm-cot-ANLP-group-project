@@ -1,0 +1,16 @@
+{
+    "preds": [
+        "Solution: To find the answer, look at the compass rose. Look at which way the north arrow is pointing. West Virginia is farthest north.",
+        "Solution:",
+        "Solution:",
+        "Solution: The text uses apostrophe, a direct address to an absent person or a nonhuman entity.nSing, O goddess, the anger of Achilles son of Peleus, that brought countless ills upon the Achaeans.",
+        "Solution:"
+    ],
+    "labels": [
+        "Solution: To find the answer, look at the compass rose. Look at which way the north arrow is pointing. West Virginia is farthest north.",
+        "Solution:",
+        "Solution:",
+        "Solution: The text uses apostrophe, a direct address to an absent person or a nonhuman entity. O goddess is a direct address to a goddess, a nonhuman entity.",
+        "Solution:"
+    ]
+}
