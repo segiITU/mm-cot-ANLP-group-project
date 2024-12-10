@@ -166,7 +166,7 @@ training_args = Seq2SeqTrainingArguments(
     per_device_eval_batch_size=4,
     weight_decay=0.01,
     num_train_epochs=50,
-    predict_with_generate=True,¨
+    predict_with_generate=True,
     generation_max_length=256,
     report_to="none",
 )
