@@ -103,12 +103,12 @@ skipped_count = 0
 original_order = []
 
 for qid in problems:
-    if processed_count < 5 and problems[qid]["split"] == "val" and qid in name_maps:
+    if processed_count < 5 and problems[qid]["split"] == "val":
         if problems[qid]["solution"]:
             problems_s[qid] = problems[qid]
             original_order.append(qid)
             problems_s[qid]['caption'] = captions[qid] if qid in captions else ""
-            problems_s[qid]['image_feature'] = image_features[int(name_maps[qid])] if qid in image_features else np.zeros((49, 2048))
+            problems_s[qid]['image_feature'] = image_features[int(name_maps[qid])] str(qid) in name_maps else np.zeros((49, 2048))
             processed_count += 1
         else:
             skipped_count += 1
