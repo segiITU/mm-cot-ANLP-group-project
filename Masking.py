@@ -24,9 +24,17 @@ for key in rationale:
             word_tokens.append(word)
     word_tokens=set(word_tokens)
     filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words]
-    rat_f=[w if not w.lower() in filtered_sentence else "_" for w in rat]
-    rationale_sentence[key] = ".".join(rat_sentence[:end])
-    rationale_remove[key] = " ".join(rat_f)
+    rat_f=[]
+    count = 0
+    for w in rat:
+        if w.lower() not in filtered_sentence:
+            rat_f.append(w)
+        else:
+            count+=1
+            rat_f.append("_")
+    rationale_sentence[key]["generated_rationale"] = ".".join(rat_sentence[:end])
+    rationale_remove[key]["generated_rationale"] = " ".join(rat_f)
+    rationale_remove[key]["count"] = count
 
 with open("Saving/rationale_masked_sentence.json", "w") as writer:
     writer.write(json.dumps(rationale_sentence, indent=4))
