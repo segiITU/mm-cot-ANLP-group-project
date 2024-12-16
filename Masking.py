@@ -11,6 +11,7 @@ rationale = json.load(open("Saving/predictions_ans_eval.json"))
 rationale_sentence=dict()
 rationale_remove=dict()
 stop_words = stopwords.words('english') + ["'s", "'ll'", "'ve'","'t", "'m'"]
+
 for key in rationale:
     rat=rationale[key]["generated_rationale"]
     rat=rat.replace(".n",". ")
@@ -23,7 +24,8 @@ for key in rationale:
         for word in word_tokenize(choice):
             word_tokens.append(word)
     word_tokens=set(word_tokens)
-    filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words]
+
+    filtered_sentence = [w.lower() for w in word_tokens if not w.lower() in stop_words]
     rat_f=[]
     count = 0
     for w in rat:
@@ -32,9 +34,9 @@ for key in rationale:
         else:
             count+=1
             rat_f.append("_")
-    rationale_sentence[key]["generated_rationale"] = ".".join(rat_sentence[:end])
-    rationale_remove[key]["generated_rationale"] = " ".join(rat_f)
-    rationale_remove[key]["count"] = count
+    rationale_sentence[key] = {"generated_rationale": ".".join(rat_sentence[:end])}
+    
+    rationale_remove[key] = {"generated_rationale": " ".join(rat_f), "count": count}
 
 with open("Saving/rationale_masked_sentence.json", "w") as writer:
     writer.write(json.dumps(rationale_sentence, indent=4))
