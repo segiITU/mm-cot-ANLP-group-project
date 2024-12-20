@@ -1,15 +1,19 @@
 # MM-CoT Rationale Masking Study
 
-This repository is forked from [mm-cot](https://github.com/amazon-science/mm-cot) to study the rationale masking effects on answer inference of the multimodal CoT model presented in [Multimodal Chain-of-Thought Reasoning in Language Models](https://arxiv.org/abs/2302.00923).
+This repository is forked from [mm-cot](https://github.com/amazon-science/mm-cot) to study the rationale masking effects on answer inference of the multimodal CoT model presented in [Multimodal Chain-of-Thought Reasoning in Language Models](https://arxiv.org/abs/2302.00923). We added code to mask rationale and code to run different test sizes and to fix some dependency issues we encoundered.
 
 The project group consists of  code is submitted as part of the Advanced Natural Language Processing course at the IT University of Copenhagen in Autumn 2024.
 
-Reading the paper, the project group noticed that the generated rationale contains the answer word-for-word used for answer inference. Therefore, the aim of this repo and our project is to observe what effects masking the last line of the generated rationale, or masking 50% of the rationale, has on the answer.  
+Reading the paper, the project group noticed that the generated rationale contains the answer word-for-word used for answer inference. Therefore, the aim of this repo and our project is to observe what effects masking the last line of the generated rationale, or masking 50% of the rationale, has on the answer.
+
+Rationale.py, generates the rationale. Masking.py takes the rationale creates both the rationale with last sentence ablated and rationale with masked keywords. Answers.py take a rationale and generates answers and scoring. The rationale needs to be manually changed. Data and model needs to be downloaded as in the original.
 
 ## Modifications
 - Added rationale masking experiments
 - Modified model architecture for ablation studies
 - 
+
+The following is the origianl readme.md:
 
 ## Original License
 This project is based on Apache 2.0 licensed code. 
